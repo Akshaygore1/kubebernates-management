@@ -88,7 +88,7 @@ app.get("/pods/:namespace", async (req, res) => {
         restarts: restarts,
         lastRestartTimes:
           lastRestartTimes.length > 0 ? lastRestartTimes : ["Never Restarted"],
-        age: convertMinutesToReadable(ageInMilliseconds)
+        age: convertMinutesToReadable(ageInMilliseconds),
       };
     });
 
@@ -103,7 +103,8 @@ app.get("/pods/:namespace", async (req, res) => {
 app.get("/logs/:namespace/:podName", async (req, res) => {
   const namespace = req.params.namespace;
   const podName = req.params.podName;
-  console.log("--------------", namespace, podName);
+
+  await new Promise((resolve) => setTimeout(resolve, 2000));
 
   try {
     const podLogs = await k8sApi.readNamespacedPodLog(podName, namespace);

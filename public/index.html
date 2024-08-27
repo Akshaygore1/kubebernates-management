@@ -3,14 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Kubernetes Management</title>
     <link
-      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <title>Kubernetes Management</title>
     <style>
       body {
-        font-family: "Roboto", sans-serif;
+        font-family: "Poppins", Arial, sans-serif;
         color: #333;
         margin: 0;
         padding: 0;
@@ -98,7 +99,7 @@
         font-size: 14px;
         font-weight: 500;
         margin-left: 10px;
-        max-width: 200px;
+        max-width: 160px;
         flex-grow: 1;
       }
 
@@ -143,7 +144,7 @@
 
       .view-logs {
         color: #ffffff;
-        font-size: 9px;
+        font-size: 12px;
         cursor: pointer;
         text-align: center;
         padding: 8px;
@@ -172,6 +173,11 @@
         text-align: center;
         padding: 8px;
         background-color: #000000;
+      }
+      .loading {
+        opacity: 0.5;
+        cursor: not-allowed;
+        pointer-events: none;
       }
     </style>
   </head>
@@ -220,9 +226,9 @@
         return `
           <div class="card">
             <div class="card-header">
-              <div class="view-logs" onclick="downloadLogs('${
-                pod.name
-              }')">Download Logs</div>
+            <div class="view-logs" onclick="downloadLogs('${
+              pod.name
+            }', event)">Download Logs</div>
               <div class="pod-name">${getPodName(pod.name)}</div>
               <div class="badge ${getBadgeClass(pod.status)}">${
           pod.status
@@ -244,7 +250,7 @@
             </div>
             <div class="card-footer">
               <div class="copy-btn" onclick="copyCommand('${pod.name}')">
-                Copy Command
+                Copy Restart Command
               </div>
             </div>
           </div>
@@ -287,27 +293,45 @@
       }
 
       function downloadLogs(podName) {
+        const downloadBtn = event.target;
+        downloadBtn.textContent = "Downloading...";
+        downloadBtn.classList.add("loading");
+
         const downloadUrl = `${url}logs/${currentNamespace}/${podName}`;
-        // Create a temporary anchor element
-        const a = document.createElement("a");
-        a.style.display = "none";
-        a.href = downloadUrl;
-        a.download = `${podName}-logs.txt`;
 
-        // Append to the body and trigger the download
-        document.body.appendChild(a);
-        a.click();
+        fetch(downloadUrl)
+          .then((response) => response.blob())
+          .then((blob) => {
+            const a = document.createElement("a");
+            a.style.display = "none";
+            const url = window.URL.createObjectURL(blob);
+            a.href = url;
+            a.download = `${podName}-logs.txt`;
 
-        // Clean up
-        window.URL.revokeObjectURL(downloadUrl);
-        document.body.removeChild(a);
+            document.body.appendChild(a);
+            a.click();
+
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+          })
+          .catch((error) => {
+            console.error("Error downloading logs:", error);
+            alert("Error downloading logs. Please try again.");
+          })
+          .finally(() => {
+            downloadBtn.textContent = "Download Logs";
+            downloadBtn.classList.remove("loading");
+          });
       }
 
       function getPodName(pod) {
         if (pod) {
           let nameArr = pod.split("-");
-          let name = nameArr.splice(-2);
-          return nameArr.join("-");
+          if (nameArr.length > 2) {
+            let name = nameArr.splice(-2);
+            return nameArr.join("-");
+          }
+          return pod;
         }
       }
 
