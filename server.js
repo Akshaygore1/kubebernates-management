@@ -46,7 +46,7 @@ app.get("/namespaces", async (req, res) => {
 
 app.get("/pods/:namespace", async (req, res) => {
   const namespace = req.params.namespace;
-  console.log("--------------", namespace);
+  // console.log("--------------", namespace);
   try {
     const podList = await k8sApi.listNamespacedPod(namespace);
     const pods = podList.body.items;
@@ -61,7 +61,7 @@ app.get("/pods/:namespace", async (req, res) => {
       // Get STATUS field
       const status = pod.status.phase;
 
-      console.log("STATUS", pod);
+      // console.log("STATUS", pod);
 
       // Calculate RESTARTS field and get the last restart time
       const restarts = pod.status.containerStatuses.reduce(

@@ -152,7 +152,7 @@
       }
       .card-footer {
         display: flex;
-        justify-content: flex-end;
+        justify-content: space-between;
         align-items: center;
         margin-top: 10px;
       }
@@ -168,7 +168,7 @@
       }
       .copy-btn {
         color: #ffffff;
-        font-size: 12px;
+        font-size: 11px;
         cursor: pointer;
         text-align: center;
         padding: 8px;
@@ -249,8 +249,11 @@
               </div>
             </div>
             <div class="card-footer">
+              <div class="copy-btn" onclick="checkYaml('${pod.name}')">
+                Copy CMD Describe Pod
+              </div>
               <div class="copy-btn" onclick="copyCommand('${pod.name}')">
-                Copy Restart Command
+                Copy CMD Restart Command
               </div>
             </div>
           </div>
@@ -324,6 +327,11 @@
           });
       }
 
+      function checkYaml(pod) {
+        const describeCommand = `kubectl describe pod ${pod} -n ${currentNamespace}`;
+        navigator.clipboard.writeText(describeCommand);
+        alert("Command copied to clipboard!");
+      }
       function getPodName(pod) {
         if (pod) {
           let nameArr = pod.split("-");
