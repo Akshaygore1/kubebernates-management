@@ -104,8 +104,6 @@ app.get("/logs/:namespace/:podName", async (req, res) => {
   const namespace = req.params.namespace;
   const podName = req.params.podName;
 
-  await new Promise((resolve) => setTimeout(resolve, 2000));
-
   try {
     const podLogs = await k8sApi.readNamespacedPodLog(podName, namespace);
 
