@@ -1,6 +1,6 @@
 {
   "name": "@akshaygore1/kubebernates-management",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A tool for Kubernetes management",
   "main": "index.js",
   "bin": {
