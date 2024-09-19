@@ -57,6 +57,20 @@
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       }
 
+      #search-container {
+        margin: 20px 0;
+        text-align: center;
+      }
+
+      #search-input {
+        width: 80%;
+        max-width: 400px;
+        padding: 10px;
+        font-size: 16px;
+        border: 2px solid #333;
+        border-radius: 4px;
+      }
+
       #pod-container {
         display: grid;
         margin-top: 2rem;
@@ -189,12 +203,16 @@
       <div class="divider-container">
         <div class="divider"></div>
       </div>
+      <div id="search-container">
+        <input type="text" id="search-input" placeholder="Search pods..." />
+      </div>
       <div id="pod-container"></div>
     </div>
 
     <script>
       const url = "http://localhost:3000/";
       let currentNamespace = "";
+      let allPods = [];
 
       function createNamespaceChip(namespace) {
         const div = document.createElement("div");
@@ -274,9 +292,14 @@
         fetch(`${url}pods/${currentNamespace}`)
           .then((response) => response.json())
           .then((data) => {
-            const podContainer = document.getElementById("pod-container");
-            podContainer.innerHTML = data.pods.map(createPodCard).join("");
+            allPods = data.pods;
+            renderPods(allPods);
           });
+      }
+
+      function renderPods(pods) {
+        const podContainer = document.getElementById("pod-container");
+        podContainer.innerHTML = pods.map(createPodCard).join("");
       }
 
       function viewLogs(podName) {
@@ -350,6 +373,18 @@
         navigator.clipboard.writeText(command);
         alert("Command copied to clipboard!");
       }
+
+      // Search functionality
+      const searchInput = document.getElementById("search-input");
+      searchInput.addEventListener("input", function () {
+        const searchTerm = this.value.toLowerCase();
+        const filteredPods = allPods.filter(
+          (pod) =>
+            pod.name.toLowerCase().includes(searchTerm) ||
+            pod.status.toLowerCase().includes(searchTerm)
+        );
+        renderPods(filteredPods);
+      });
     </script>
   </body>
 </html>
